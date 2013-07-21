@@ -39,7 +39,7 @@ typedef struct {
 void logger(char *txt, char *ip_local, int port_local, char *ip_dist, int port_dist);
 void initServer(t_socket *server);
 void initClient(t_socket *client);
-int routeData(int socketSource, int socketDest, char *side);
+int routeData(int socketSource, int socketDest);
 void my_tgw(char *ip_local, char *ip_dist, int port_local, int port_dist);
 
 static void *tserver(void *server);

@@ -1,8 +1,9 @@
 #include "my_tgw.h"
 
-static int PORT_LOCAL;
-static int PORT_DIST;
-static char *IP_DIST;
+static int s_port_local;
+static int s_port_dist;
+static char *s_ip_local;
+static char *s_ip_dist;
 
 void logger(char *txt, char *ip_local, int port_local, char *ip_dist, int port_dist)
 {
@@ -16,7 +17,8 @@ void logger(char *txt, char *ip_local, int port_local, char *ip_dist, int port_d
     if ((fd = fopen("my_tgw.log", "a")) == NULL)
         my_error(1, "open()", 0);
     fprintf(fd, "%d-%02d-%02d %02d-%02d-%02d:%s:%d:%s:%d:%s\n",
-            t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec,
+            t.tm_year + 1900, t.tm_mon + 1, t.tm_mday,
+            t.tm_hour, t.tm_min, t.tm_sec,
             ip_local, port_local, ip_dist, port_dist, txt);
     fclose(fd);
 }
@@ -30,7 +32,7 @@ void initServer(t_socket *server)
     bzero((char *) &server->serv_addr, sizeof (server->serv_addr));
     server->serv_addr.sin_family = AF_INET;
     server->serv_addr.sin_addr.s_addr = INADDR_ANY;
-    server->serv_addr.sin_port = htons(PORT_LOCAL);
+    server->serv_addr.sin_port = htons(s_port_local);
     if (bind(socklisten, (struct sockaddr *) &server->serv_addr,
              sizeof (server->serv_addr)) < 0)
         my_error(2, "bind()", server->sockfd);
@@ -45,18 +47,18 @@ void initClient(t_socket *client)
 {
     if ((client->sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         my_error(2, "socket()", -1);
-    if ((client->hostinfo = gethostbyname(IP_DIST)) == NULL)
+    if ((client->hostinfo = gethostbyname(s_ip_dist)) == NULL)
         my_error(2, "L'hôte n'existe pas", client->sockfd);
     bzero((char *) &client->serv_addr, sizeof (client->serv_addr));
     client->serv_addr.sin_family = AF_INET;
-    client->serv_addr.sin_addr.s_addr = inet_addr(IP_DIST);
-    client->serv_addr.sin_port = htons(PORT_DIST);
+    client->serv_addr.sin_addr.s_addr = inet_addr(s_ip_dist);
+    client->serv_addr.sin_port = htons(s_port_dist);
     if ((connect(client->sockfd, (struct sockaddr *)
                  &client->serv_addr, sizeof (client->serv_addr))) < 0)
         my_error(2, "connect()", client->sockfd);
 }
 
-int routeData(int socketSource, int socketDest, char *side)
+int routeData(int socketSource, int socketDest)
 {
     char buffer[200];
     int ret;
@@ -75,6 +77,7 @@ static void *tserver(void *tserver)
     pthread_t tclt;
     int ret;
 
+    ret = 1;
     initServer(server);
     connectionData.sockserver = server->sockfd;
     connectionData.sockclient = -1;
@@ -82,14 +85,9 @@ static void *tserver(void *tserver)
     pthread_mutex_init(&connectionData.socketmutex, NULL);
     pthread_create(&tclt, NULL, tclient, (void*) &connectionData);
     sleep(3);
-    while (1) {
-        ret = routeData(connectionData.sockserver, connectionData.sockclient, "server");
-        if (ret <= 0)
-            break;
-        if (connectionData.stop == 1)
-            break;
+    while (ret > 0) {
+        ret = routeData(connectionData.sockserver, connectionData.sockclient);
     }
-    connectionData.stop = 1;
     pthread_mutex_lock(&connectionData.socketmutex);
     if (connectionData.sockserver != -1) {
         close(connectionData.sockserver);
@@ -109,16 +107,13 @@ static void *tclient(void *tconnectionData)
     t_connectionData *connectionData = (t_connectionData*) tconnectionData;
     int ret;
 
+    ret = 1;
     initClient(&client);
+    logger("BEGIN", s_ip_local, s_port_local, s_ip_dist, s_port_dist);
     connectionData->sockclient = client.sockfd;
-    while (1) {
-        ret = routeData(connectionData->sockclient, connectionData->sockserver, "client");
-        if (ret <= 0)
-            break;
-        if (connectionData->stop == 1)
-            break;
+    while (ret > 0) {
+        ret = routeData(connectionData->sockclient, connectionData->sockserver);
     }
-    connectionData->stop = 1;
     pthread_mutex_lock(&connectionData->socketmutex);
     if (connectionData->sockserver != -1) {
         close(connectionData->sockserver);
@@ -131,27 +126,12 @@ void my_tgw(char *ip_local, char *ip_dist, int port_local, int port_dist)
 {
     t_socket server;
     pthread_t tsrv;
-    int ok;
 
-    ok = 1;
-    IP_DIST = ip_dist;
-    PORT_DIST = port_dist;
-    PORT_LOCAL = port_local;
+    s_ip_dist = ip_dist;
+    s_ip_local = ip_local;
+    s_port_dist = port_dist;
+    s_port_local = port_local;
     pthread_create(&tsrv, NULL, tserver, (void*) &server);
     pthread_join(tsrv, NULL);
-
-    /*
-        initServer(&server, port_local);
-        initClient(&client, ip_dist, port_dist);
-        logger("BEGIN", ip_local, port_local, ip_dist, port_dist);
-        while (ok == 1) {
-            ok = readSocket(&server);
-            sendSocket(&client, server.buffer);
-        }
-        logger("END", ip_local, port_local, ip_dist, port_dist);
-        shutdown(server.sockfd, 2);
-        close(server.sockfd);
-        shutdown(client.sockfd, 2);
-        close(client.sockfd);
-     */
+    logger("END", s_ip_local, s_port_local, s_ip_dist, s_port_dist);
 }
