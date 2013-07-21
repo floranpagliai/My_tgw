@@ -16,7 +16,7 @@ FLAG	=	-W -Wall -Werror -Wextra
 
 $(NAME)	:	$(SRC)
 		$(CC) -c $(SRC)
-		$(CC) -o $(NAME) $(OBJ)
+		$(CC) -o $(NAME) $(OBJ) -lpthread
 
 all	:	$(NAME)
 

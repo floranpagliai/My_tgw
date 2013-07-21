@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "my_error.h"
+
 char    *get_ip(char *str);
 char	*get_port(char *str);
 
