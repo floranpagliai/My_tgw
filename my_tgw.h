@@ -1,3 +1,13 @@
+/*
+** my_tgw.h for my_tgw in /home/paglia_f//my_tgw
+** 
+** Made by floran pagliai
+** Login   <paglia_f@epitech.net>
+** 
+** Started on  Mon Jul 22 09:58:59 2013 floran pagliai
+** Last update Mon Jul 22 10:01:41 2013 floran pagliai
+*/
+
 #ifndef _MY_TGW_H_
 #define	_MY_TGW_H_
 
@@ -36,7 +46,7 @@ typedef struct {
     pthread_mutex_t socketmutex;
 }       t_connectionData;
 
-void logger(char *txt, char *ip_local, int port_local, char *ip_dist, int port_dist);
+void logger(char *txt);
 void initServer(t_socket *server);
 void initClient(t_socket *client);
 int routeData(int socketSource, int socketDest);

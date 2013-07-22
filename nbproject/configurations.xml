@@ -2,7 +2,13 @@
 <configurationDescriptor version="84">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df name="my_tgw" root=".">
+      <in>dataFuncs.c</in>
+      <in>dataFuncs.h</in>
       <in>main.c</in>
+      <in>my_error.c</in>
+      <in>my_error.h</in>
+      <in>my_tgw.c</in>
+      <in>my_tgw.h</in>
     </df>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
