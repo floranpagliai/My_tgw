@@ -97,7 +97,8 @@ static void	*tserver(void *tserver)
     socketData.sockclient = -1;
     pthread_mutex_init(&socketData.socketmutex, NULL);
     pthread_create(&tclt, NULL, tclient, (void*) &socketData);
-    sleep(3);
+    while (socketData.sockclient == -1)
+    {}
     while (ret > 0)
         ret = routeData(socketData.sockserver, socketData.sockclient);
     pthread_mutex_lock(&socketData.socketmutex);
@@ -121,6 +122,8 @@ static void	*tclient(void *tsocketData)
     initClient(&client);
     logger("BEGIN");
     socketData->sockclient = client.sockfd;
+    while (socketData->sockserver == -1)
+    {}
     while (ret > 0)
         ret = routeData(socketData->sockclient, socketData->sockserver);
     pthread_mutex_lock(&socketData->socketmutex);

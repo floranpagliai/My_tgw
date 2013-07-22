@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -34,7 +36,6 @@ typedef struct {
     struct sockaddr_in cli_addr;
     struct hostent *hostinfo;
     int sockfd;
-    //int portno;
     int clilen;
 }       t_socket;
 
