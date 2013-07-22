@@ -86,7 +86,7 @@ int		routeData(int socketSource, int socketDest)
 static void	*tserver(void *tserver)
 {
     t_socket	*server;
-    t_connectionData socketData;
+    t_socketData socketData;
     pthread_t	tclt;
     int		ret;
 
@@ -95,7 +95,6 @@ static void	*tserver(void *tserver)
     initServer(server);
     socketData.sockserver = server->sockfd;
     socketData.sockclient = -1;
-    socketData.stop = 0;
     pthread_mutex_init(&socketData.socketmutex, NULL);
     pthread_create(&tclt, NULL, tclient, (void*) &socketData);
     sleep(3);
@@ -115,9 +114,10 @@ static void	*tserver(void *tserver)
 static void	*tclient(void *tsocketData)
 {
     t_socket	client;
-    t_connectionData *socketData = (t_connectionData*) tsocketData;
+    t_socketData *socketData;
     int ret;
 
+    socketData = (t_socketData*) tsocketData;
     ret = 1;
     initClient(&client);
     logger("BEGIN");

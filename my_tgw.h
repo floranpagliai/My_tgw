@@ -30,28 +30,25 @@
 #include "my_error.h"
 
 typedef struct {
-    int port;
-    char *ip;
     struct sockaddr_in serv_addr;
     struct sockaddr_in cli_addr;
     struct hostent *hostinfo;
     int sockfd;
-    int portno;
+    //int portno;
     int clilen;
 }       t_socket;
 
 typedef struct {
     int sockclient;
     int sockserver;
-    int stop;
     pthread_mutex_t socketmutex;
-}       t_connectionData;
+}       t_socketData;
 
-void logger(char *txt);
-void initServer(t_socket *server);
-void initClient(t_socket *client);
-int routeData(int socketSource, int socketDest);
-void my_tgw(char *ip_local, char *ip_dist, int port_local, int port_dist);
+void logger(char *);
+void initServer(t_socket *);
+void initClient(t_socket *);
+int routeData(int, int);
+void my_tgw(char *, char *, int, int);
 
 #endif	/* _MY_TGW_H_ */
 
