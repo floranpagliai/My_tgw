@@ -15,8 +15,8 @@ static int s_port_dist;
 static char *s_ip_local;
 static char *s_ip_dist;
 
-static void *tserver(void *server);
-static void *tclient(void *server);
+static void *tserver(void *);
+static void *tclient(void *);
 
 void		logger(char *txt)
 {
@@ -98,9 +98,8 @@ static void	*tserver(void *tserver)
     pthread_mutex_init(&socketData.socketmutex, NULL);
     pthread_create(&tclt, NULL, tclient, (void*) &socketData);
     sleep(3);
-    while (ret > 0) {
+    while (ret > 0)
         ret = routeData(socketData.sockserver, socketData.sockclient);
-    }
     pthread_mutex_lock(&socketData.socketmutex);
     if (socketData.sockserver != -1)
         close(socketData.sockserver);
@@ -122,9 +121,8 @@ static void	*tclient(void *tsocketData)
     initClient(&client);
     logger("BEGIN");
     socketData->sockclient = client.sockfd;
-    while (ret > 0) {
+    while (ret > 0)
         ret = routeData(socketData->sockclient, socketData->sockserver);
-    }
     pthread_mutex_lock(&socketData->socketmutex);
     if (socketData->sockserver != -1)
         close(socketData->sockserver);
