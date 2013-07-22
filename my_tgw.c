@@ -15,6 +15,9 @@ static int s_port_dist;
 static char *s_ip_local;
 static char *s_ip_dist;
 
+static void *tserver(void *server);
+static void *tclient(void *server);
+
 void		logger(char *txt)
 {
     FILE	*fd;
@@ -100,16 +103,13 @@ static void	*tserver(void *tserver)
         ret = routeData(socketData.sockserver, socketData.sockclient);
     }
     pthread_mutex_lock(&socketData.socketmutex);
-    if (socketData.sockserver != -1) {
+    if (socketData.sockserver != -1)
         close(socketData.sockserver);
-        socketData.sockserver = -1;
-    }
-    if (socketData.sockclient != -1) {
+    if (socketData.sockclient != -1)
         close(socketData.sockclient);
-        socketData.sockclient = -1;
-    }
     pthread_mutex_unlock(&socketData.socketmutex);
     pthread_join(tclt, NULL);
+    return NULL;
 }
 
 static void	*tclient(void *tsocketData)
@@ -126,11 +126,10 @@ static void	*tclient(void *tsocketData)
         ret = routeData(socketData->sockclient, socketData->sockserver);
     }
     pthread_mutex_lock(&socketData->socketmutex);
-    if (socketData->sockserver != -1) {
+    if (socketData->sockserver != -1)
         close(socketData->sockserver);
-        socketData->sockserver = -1;
-    }
     pthread_mutex_unlock(&socketData->socketmutex);
+    return NULL;
 }
 
 void		my_tgw(char *ip_local, char *ip_dist, int port_local, int port_dist)

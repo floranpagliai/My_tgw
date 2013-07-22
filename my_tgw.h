@@ -1,9 +1,9 @@
 /*
 ** my_tgw.h for my_tgw in /home/paglia_f//my_tgw
-** 
+**
 ** Made by floran pagliai
 ** Login   <paglia_f@epitech.net>
-** 
+**
 ** Started on  Mon Jul 22 09:58:59 2013 floran pagliai
 ** Last update Mon Jul 22 10:01:41 2013 floran pagliai
 */
@@ -21,6 +21,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <time.h>
 #include <netdb.h>
@@ -52,7 +53,5 @@ void initClient(t_socket *client);
 int routeData(int socketSource, int socketDest);
 void my_tgw(char *ip_local, char *ip_dist, int port_local, int port_dist);
 
-static void *tserver(void *server);
-static void *tclient(void *server);
 #endif	/* _MY_TGW_H_ */
 
